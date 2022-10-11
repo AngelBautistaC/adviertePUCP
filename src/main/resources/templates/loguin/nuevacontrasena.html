@@ -105,7 +105,7 @@
 
         <div class="d-flex align-items-center h-custom-2 px-5 ms-xl-4 mt-5 pt-5 pt-xl-0 mt-xl-n5">
 
-          <form class="formulario needs-validation" th:action="@{'/nuevopwd'}" style="width: 23rem" method="post" novalidate>
+          <form class="formulario needs-validation" th:action="@{'/nuevopwd'}" style="width: 23rem" method="post" novalidate autocomplete="off">
             <input type="hidden" th:value="${token}" name="token" />
 
             <div class="card text-center" style="margin-top: -50px;margin-bottom: 30px">
@@ -116,14 +116,18 @@
 
             <h3 class="fw-normal mb-3 pb-3" style="letter-spacing: 1px;font-family: Roboto">Establecer una contraseña nueva</h3>
             <div th:if="${invalidtoken != null}" th:text="${invalidtoken}" class="alert alert-alert" role="alert"></div>
+            <div th:if="${noregistrado != null}" th:text="${noregistrado}" class="alert alert-warning" role="alert"></div>
 
 
-            <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip" title="La contraseña debe contener un minimo de 8 caracteres, una minúscula, una mayúscula y un carácter especial,tales como @#$%^&+=">
-                    <i style="font-weight: bold;color:#17a2b8" class="bi bi-info-circle-fill" th:text="${'Consideraciones para la contraseña'}"></i>
-                </span>
+            <div class="alert alert-primary alert-dismissible fade show" role="alert">
+              <h5 class="alert-heading">Consideraciones para la contraseña</h5>
+              <p class="mb-0">La contraseña debe contener un mínimo de 8 caracteres, una minúscula, una mayúscula y un carácter especial,tales como @#$%^&+=</p>
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+
 
             <div class="form-outline mb-4">
-              <label class="form-label" for="validationCustom02"><br>Ingresar la nueva contraseña</label>
+              <label class="form-label" for="validationCustom02"><br>Ingresa la nueva contraseña</label>
               <input type="password" id="validationCustom02"  class="form-control form-control-lg" th:value="${pwd}" name="pwd"
                      th:classappend="${fail==null?'':'is-invalid'}"/>
               <div  th:if="${fail != null}" th:text="${fail}" class="invalid-feedback"></div>
@@ -142,7 +146,7 @@
               </div>
             </div>
 
-            <p>¿Ya tienes una cuenta? <a href="/"  style="color: blue;font-family: Roboto">¡Inicia Sesión!</a></p>
+            <p>¿Ya tienes una cuenta? <a href="/"  style="color: blue;font-family: Roboto" class="link-primary">¡Inicia Sesión!</a></p>
 
           </form>
 

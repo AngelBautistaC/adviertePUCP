@@ -27,8 +27,8 @@ public interface UsuarioRepository extends JpaRepository<Usuario, String> {
 
     @Modifying
     @Transactional
-    @Query(value="update usuario set codigoverificacion=?1 where codigo=?2",nativeQuery = true)
-    void enviarcodigo(String codigoverificacion, String codigo);
+    @Query(value="update usuario set codigoverificacion=?1,contadortoken=?2 where codigo=?3",nativeQuery = true)
+    void enviarcodigo(String codigoverificacion,int contadortoken ,String codigo);
 
     /*Verifica token para el registro del usuario==Establecer contraseña*/
 
@@ -37,7 +37,7 @@ public interface UsuarioRepository extends JpaRepository<Usuario, String> {
 
     @Modifying
     @Transactional
-    @Query(value="update usuario set codigoverificacion=null ",nativeQuery = true)
+    @Query(value="update usuario set codigoverificacion=null,contadortoken=0 ",nativeQuery = true)
     void deleteToken();
 
 
@@ -48,7 +48,13 @@ public interface UsuarioRepository extends JpaRepository<Usuario, String> {
 
     @Modifying
     @Transactional
-    @Query(value="update usuario set pwd=?1, suspendido=0 where codigo=?2",nativeQuery = true)
+    @Query(value="update usuario set contadortoken=0 where codigo=?1 ",nativeQuery = true)
+    void registroResetearContador(String id);
+
+
+    @Modifying
+    @Transactional
+    @Query(value="update usuario set pwd=?1, habilitado=1 where codigo=?2",nativeQuery = true)
     void establecerContrasena(String pwd, String id);
 
     @Modifying

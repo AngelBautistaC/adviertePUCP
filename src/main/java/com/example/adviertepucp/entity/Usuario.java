@@ -70,6 +70,17 @@ public class Usuario implements Serializable {
     @Column(name = "habilitado", nullable = false)
     private Byte habilitado;
 
+    @NotNull
+    @Column(name = "contadortoken", nullable = false)
+    private Byte contadortoken;
+
+    public Byte getContadortoken() {
+        return contadortoken;
+    }
+
+    public void setContadortoken(Byte contadortoken) {
+        this.contadortoken = contadortoken;
+    }
 
 
     public String getId() {

@@ -5,22 +5,18 @@ import com.example.adviertepucp.entity.Usuario;
 import com.example.adviertepucp.repository.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableAsync;
-import org.springframework.scheduling.annotation.Scheduled;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
 import java.time.LocalTime;
 import java.time.ZoneId;
-import java.util.Timer;
 
 import static java.lang.Math.abs;
 
@@ -101,16 +97,7 @@ public class MailService {
     public void eliminaToken() {
         usuarioRepository.deleteToken();}
 
-    public int contadorDiezMin(){
 
-        LocalTime localTime = LocalTime.now(ZoneId.of("GMT-5"));
-
-        String timex= String.valueOf(localTime);
-
-        String[] time = timex.split(":", -2);
-
-        return abs(30-Integer.parseInt(time[1])%30);
-    }
 
 
 }

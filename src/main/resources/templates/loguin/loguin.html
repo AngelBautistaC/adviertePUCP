@@ -1,187 +1,88 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <!-- CSS only -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-gH2yIJqKdNHPEq0n4Mqa/HGKIhSkIHeL5AyhkYV8i59U5AR6csBvApHHNl/vI1Bx" crossorigin="anonymous">
-    <!-- JavaScript Bundle with Popper -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-A3rJD856KowSb7dwlZdYEkO39Gagi7vIsF0jrRAoQmDKKtQBHUuLZ9AsSv4jD4Xa" crossorigin="anonymous"></script>
-
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.5/dist/umd/popper.min.js" integrity="sha384-Xe+8cL9oJa6tN/veChSP7q+mnSPaj5Bcu9mPX5F5xIGE0DVittaqT5lorf0EI7Vk" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.min.js" integrity="sha384-ODmDIVzN+pFdexxHEHFBQH3/9/vQ9uori45z4JjnFsRydbmQbmL5t1tQ0culUzyK" crossorigin="anonymous"></script>
-
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.0/font/bootstrap-icons.css">
-    <script src="https://kit.fontawesome.com/7430756d1a.js" crossorigin="anonymous"></script>
-
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="/css/loguin.css">
-    <link rel="stylesheet" href="/css/main.css">
-
-    <meta charset="UTF-8">
-    <title>AdviertePUCP-loguin</title>
-    <link rel="icon" type="image/x-icon" href="/images/webICON.png">
-
-
-    <style>
-
-        .logueoimg{
-            box-shadow: 10px 10px 80px rgba(0, 0, 0, 0.3);
-        }
-
-
-        @media only screen and (max-width: 994px) {
-            .logueoimg {
-                display: none;
-            }
-            .ardilla{
-                max-height: 120px; !important;
-                max-width: 300px; !important;
-            }
-
-        }
-
-        .bg-image-vertical {
-            position: relative;
-            overflow: hidden;
-            background-repeat: no-repeat;
-            background-position: right center;
-            background-size: auto 100%;
-        }
-
-        @media (min-width: 1025px) {
-            .h-custom-2 {
-                height: 65%;
-            }
-            .formulario{
-                margin-left: 20%;
-            }
-            .advnav{
-                margin-left: 16%;
-                margin-top: 5%;
-            }
-
-            .ardilla{
-                height: 184px;
-                width: 423px;
-                margin-bottom: 30px ;
-            }
-
-
-        }
-
-
-
-    </style>
-
-    <meta name="google-signin-client_id" content="YOUR_CLIENT_ID.apps.googleusercontent.com">
+    <div  th:replace="fragmentos/loginfragment.html :: cabecera(title='AdviertePUCP-Login')"></div>
 </head>
+
 <body>
-
-<!--    <img class="logueoimg"  style="position: absolute;height: 100%;z-index: -1"  src="/images/loguin.png">-->
-<section class="vh-100 vw-100">
-    <div class="container-fluid">
+<section class="vh-100" style="background-color: hsl(0, 0%, 96%)">
+    <div class="container-fluid h-custom">
         <div class="row d-flex justify-content-center align-items-center h-100">
-
-
             <div class="col-md-9 col-lg-6 col-xl-5">
-                <img class="logueoimg" src="/images/loguin.png"
-                     alt="Login image" style="height: 80%;width: 100%;text-align: center">
+
+                <img src="/images/loguin.png" style="width: 800px; height:670px"
+                     class="img-fluid logueoimg" alt="Sample image">
+
             </div>
 
 
+            <div class="col-md-8 col-lg-6 col-xl-4 offset-xl-1">
+                <img style="height: 165px;width: 393px" class="img-fluid " src="/images/quillaloguin.png">
 
+                <p><br></p>
 
-
-            <div class="col-sm-6 text-black">
-
-
-                <div  class=" px-5 ms-xl-4 " >
-
-
-
-                    <div class="advnav " >
-                        <img style="height: 184px;width: 423px" class="ardilla " src="/images/quillaloguin.png">
-                        <!--                            <img style="height: 150px;width: 300px" class="ardillamobile " src="/images/quillaloguin.png">-->
-
+                <div class="card text-center"  style="max-width: 368px">
+                    <div class="card-header" style="font-size: 20px;padding-top: 10px">
+                        Sistema de Reporte de Incidencias
                     </div>
                 </div>
 
-                <div class="d-flex align-items-center h-custom-2 px-5 ms-xl-4 mt-5 pt-5 pt-xl-0 mt-xl-n5">
-
-                    <form class="formulario needs-validation" th:action="@{/processLogin}"  style="width: 23rem" method="post" novalidate>
-                        <div class="card text-center" style="margin-top: -50px;margin-bottom: 30px">
-                            <div class="card-header" style="font-family: Roboto;font-size: 20px">
-                                Sistema de Reporte de Incidencias
-                            </div>
-                        </div>
-
-                        <h3 class="fw-normal mb-3 pb-3" style="letter-spacing: 1px;font-family: Roboto">Ingresa con tu cuenta</h3>
-<!--                        <div th:if="${registrado != null}" th:text="${registrado}" class="alert alert-success" role="alert"></div>-->
-<!--                        <div th:if="${noexiste != null}" th:text="${noexiste}" class="alert alert-danger" role="alert"></div>-->
-<!--                        <div th:if="${noregistrado != null}" th:text="${noregistrado}" class="alert alert-warning" role="alert"></div>-->
-                        <div th:if="${CancelLogin != null}" th:text="${CancelLogin}" class="alert alert-danger" role="alert"></div>
-
-                        <div class="form-outline mb-4">
-                            <input type="text" id="form2Example18" class="form-control form-control-lg" th:value="${id}" name="id" autofocus
-                                   th:classappend="${validacionid==null?'':'is-invalid'}"   />
-                            <label class="form-label" for="form2Example18">Código PUCP</label>
-                            <div  th:if="${validacionid != null}" th:text="${validacionid}" class="invalid-feedback"></div>
-                        </div>
-
-                        <div class="form-outline mb-4">
-                            <input type="password" id="form2Example28" class="form-control form-control-lg" th:value="${pwd}" name="pwd"
-                                   th:classappend="${validacionpwd==null?'':'is-invalid'}" />
-                            <label class="form-label" for="form2Example28">Contraseña</label>
-                            <div  th:if="${validacionpwd != null}" th:text="${validacionpwd}" class="invalid-feedback"></div>
-
-                            <br><br>
-
-                            <div class="d-flex justify-content-start"><input class="form-check-input" type="checkbox" onclick="myFunction()">&nbsp;Mostrar contraseña&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a  class="text-muted" href="/restablecercontrasena">¿Olvidaste tu contraseña?</a></div>
-
-                        </div>
-                        <div class="d-flex justify-content-center">
-                            <div class="form-outline mb-4">
-                                <button class="btn-hover color-3" type="submit"  style="border-radius: 10px;height: 75%;padding: 7px;"><b style="color: white">Iniciar Sesión</b></button>
-                            </div>
-                        </div>
-
-                        <div class="hr-sect" style="padding-bottom: 15px">o</div>
-                        <div class="d-flex justify-content-center">
-                            <div class="form-outline mb-4">
-
-                                <a  style="padding: 11px;font-family: Roboto" type="submit" class="btn btn-outline-dark" href="/oauth2/authorization/google">
-                                <img style="margin-top: -5px" src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg"/> Iniciar sesión con Google
-                                </a>
-
-                            </div>
-                        </div>
-                        <p >¿Aún no tienes una cuenta? <a href="/registro"  style="color: blue;font-family: Roboto">¡Registrate!</a></p>
-
-                    </form>
-
+                <br>
+                <div class="card text-center" style="max-width: 368px">
+                <a  style="padding: 11px" type="submit" class="btn btn-outline-dark" href="/oauth2/authorization/google">
+                    <img style="margin-top: -5px" src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg"/> Iniciar sesión con Google
+                </a>
+                </div>
+                <br>
+                <div th:if="${noexiste != null or CancelLogin != null }" class="card text-center" style="max-width: 368px">
+                <div th:if="${noexiste != null}" th:text="${noexiste}" class="alert alert-danger " role="alert"></div>
+                <div th:if="${CancelLogin != null}" th:text="${CancelLogin}" class="alert alert-danger" role="alert"></div>
                 </div>
 
-            </div>
+                <div class="divider d-flex align-items-center my-4" style="max-width: 368px">
+                    <p class="text-center fw-bold mx-3 mb-0">O</p>
+                </div>
 
+                <form class="formulario needs-validation" th:action="@{/processLogin}"  style="width: 23rem" method="post" novalidate>
+
+                    <!-- Email input -->
+                    <div class="form-outline mb-4">
+                        <label class="form-label" for="form2Example18">Código PUCP</label>
+                        <input type="text" id="form2Example18" class="form-control form-control-lg" th:value="${id}" name="id" autofocus
+                               th:classappend="${validacionid==null?'':'is-invalid'}"   />
+
+                        <div  th:if="${validacionid != null}" th:text="${validacionid}" class="invalid-feedback"></div>
+                    </div>
+
+                    <!-- Password input -->
+                    <div class="form-outline mb-4">
+                        <label class="form-label" for="form2Example28">Contraseña</label>
+                        <input type="password" id="form2Example28" class="form-control form-control-lg" th:value="${pwd}" name="pwd"
+                               th:classappend="${validacionpwd==null?'':'is-invalid'}" />
+
+                        <p th:if="${param.error}" class="form-signin-heading" style="color:red">Credenciales incorrectas</p>
+                        <br><br>
+
+                        <div class="d-flex justify-content-start"><input class="form-check-input" type="checkbox" onclick="myFunction()">&nbsp;Mostrar contraseña&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a  class="text-muted" href="/restablecercontrasena">¿Olvidaste tu contraseña?</a></div>
+
+                    </div>
+
+
+
+                    <div class="card text-center border-light bg-transparent" style="max-width: 368px">
+                        <button type="submit" class="btn btn-outline-primary btn-lg"
+                                style="padding-left: 2.5rem; padding-right: 2.5rem">Iniciar Sesión</button>
+                        <p class="small fw-bold mt-2 pt-1 mb-0">¿Aún no tienes una cuenta? <a href="/registro" class="link-primary">¡Registrate!</a></p>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
-</section>
 
+</section>
 </body>
 
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <script src="https://apis.google.com/js/platform.js?onload=renderButton" async defer></script>
-
-
-<script>
-
-    function myFunction() {
-        var x = document.getElementById("form2Example28");
-        if (x.type === "password") {
-            x.type = "text";
-        } else {
-            x.type = "password";
-        }
-    }
-</script>
 
 </html>

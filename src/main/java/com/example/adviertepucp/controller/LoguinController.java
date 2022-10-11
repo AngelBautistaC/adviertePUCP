@@ -170,6 +170,42 @@ public class LoguinController {
         return "redirect:/redirectByRole";
 
     }
+
+    @PostMapping("enviaDatosRestablecer")
+    public String enviaDatosRestablecer(@RequestParam("id")  String id,
+                                        @RequestParam("correo")  String correo, RedirectAttributes attr, Model model, HttpServletRequest httpServletRequest) throws MessagingException, UnsupportedEncodingException {
+
+        attr.addFlashAttribute("id", id);
+        attr.addFlashAttribute("correo", correo);
+
+        List<Usuario> usuarioEncontrado=usuarioRepository.validarUsuario(id,correo);
+        if (usuarioEncontrado.size()==0){
+            attr.addFlashAttribute("fail", "Los datos ingresados no coinciden con el registro de usuarios.");
+        } else{
+            if(usuarioEncontrado.get(0).getHabilitado()==0){
+                if (usuarioEncontrado.get(0).getContadortoken()==3){
+
+                    attr.addFlashAttribute("tresintentos","3 intentos");
+                }
+                else {
+                    int contadortoken=usuarioEncontrado.get(0).getContadortoken()+1;
+                    int endIndex=httpServletRequest.getRequestURL().length()-21;
+                    String contextpath=httpServletRequest.getRequestURL().substring(0,endIndex);
+
+                    String codigoVerificacion = RandomString.make(64);
+                    usuarioRepository.enviarcodigo(codigoVerificacion,contadortoken ,id);
+                    mailService.sendVerificationEmail(usuarioEncontrado.get(0), codigoVerificacion,contextpath,2);
+
+                    attr.addFlashAttribute("success", "Datos confirmados correctamente, se ha enviado un correo de confirmación.");
+                }
+            }
+            else{
+                attr.addFlashAttribute("already", "Usuario no registrado.");
+            }
+        }
+        return "redirect:/restablecercontrasena";
+    }
+
     @PostMapping("enviaDatosRegistro")
     public String enviaRegistro(@RequestParam("id")  String id,
                                 @RequestParam("correo")  String correo, RedirectAttributes attr, Model model, HttpServletRequest httpServletRequest) throws MessagingException, UnsupportedEncodingException {
@@ -181,22 +217,24 @@ public class LoguinController {
         if (usuarioEncontrado.size()==0){
             attr.addFlashAttribute("fail", "Los datos ingresados no coinciden con el registro de usuarios.");
         } else{
-            if(usuarioEncontrado.get(0).getSuspendido()!=4){
+            if(usuarioEncontrado.get(0).getHabilitado()==1){
                 attr.addFlashAttribute("already", "Este usuario ya se encuentra registrado en el sistema.");
             }
             else{
-                if (usuarioEncontrado.get(0).getCodigoverificacion()!=null){
-                    int minutes= mailService.contadorDiezMin();
-                    attr.addFlashAttribute("already","Ya se envió un correo de validación. Por favor, verifica la bandeja de entrada o spam en tu correo o inténtalo de nuevo dentro de "+minutes+" minuto(s)");
+                if (usuarioEncontrado.get(0).getContadortoken()>=3){
+                    attr.addFlashAttribute("tresintentos","3 intentos");
                 }
                 else {
+                    int contadortoken=usuarioEncontrado.get(0).getContadortoken()+1;
+
 
                     int endIndex=httpServletRequest.getRequestURL().length()-18;
                     String contextpath=httpServletRequest.getRequestURL().substring(0,endIndex);
 
                     String codigoVerificacion = RandomString.make(64);
-                    usuarioRepository.enviarcodigo(codigoVerificacion, id);
+                    usuarioRepository.enviarcodigo(codigoVerificacion,contadortoken ,id);
                     mailService.sendVerificationEmail(usuarioEncontrado.get(0), codigoVerificacion,contextpath,1);
+
 
                     attr.addFlashAttribute("success", "Datos confirmados correctamente, se ha enviado un correo de confirmación.");
                 }
@@ -218,7 +256,7 @@ public class LoguinController {
                     return "loguin/nuevacontrasena";
                 }
             }
-            attr.addFlashAttribute("invalidtoken", "Error:token inválido o vencido (El token de verificación vence cada media hora)");
+            attr.addFlashAttribute("invalidtoken", "Error: token inválido o vencido.");
             return "redirect:/registro";
         }
         return "redirect:/redirectByRole";
@@ -265,52 +303,22 @@ public class LoguinController {
 
         String passwd=new BCryptPasswordEncoder().encode(pwd);
 
-        if (usuario.getSuspendido()==4){
+        if (usuario.getHabilitado()==0){
             usuarioRepository.establecerContrasena(passwd, usuario.getId());
             usuarioRepository.deleteTokenbyId(usuario.getId());
+            usuarioRepository.registroResetearContador(usuario.getId());
             attr.addFlashAttribute("registrado", "Cuanta registrada correctamente, ahora puedes ingresar al sistema.");
         }
-        else if (usuario.getSuspendido()<4){
+        else if (usuario.getHabilitado()==1){
             usuarioRepository.reestablecerContrasena(passwd, usuario.getId());
             usuarioRepository.deleteTokenbyId(usuario.getId());
+            usuarioRepository.registroResetearContador(usuario.getId());
             attr.addFlashAttribute("registrado", "Contraseña cambiada correctamente.");
         }
         return "redirect:/";
     }
 
-    @PostMapping("enviaDatosRestablecer")
-    public String enviaDatosRestablecer(@RequestParam("id")  String id,
-                                @RequestParam("correo")  String correo, RedirectAttributes attr, Model model, HttpServletRequest httpServletRequest) throws MessagingException, UnsupportedEncodingException {
 
-        attr.addFlashAttribute("id", id);
-        attr.addFlashAttribute("correo", correo);
-
-        List<Usuario> usuarioEncontrado=usuarioRepository.validarUsuario(id,correo);
-        if (usuarioEncontrado.size()==0){
-            attr.addFlashAttribute("fail", "Los datos ingresados no coinciden con el registro de usuarios.");
-        } else{
-            if(usuarioEncontrado.get(0).getSuspendido()!=4){
-                if (usuarioEncontrado.get(0).getCodigoverificacion()!=null){
-                    int minutes= mailService.contadorDiezMin();
-                    attr.addFlashAttribute("already","Ya se envió un correo de validación. Por favor, verifica la bandeja de entrada o spam en tu correo o inténtalo de nuevo dentro de "+minutes+" minuto(s).");
-                }
-                else {
-                    int endIndex=httpServletRequest.getRequestURL().length()-21;
-                    String contextpath=httpServletRequest.getRequestURL().substring(0,endIndex);
-
-                    String codigoVerificacion = RandomString.make(64);
-                    usuarioRepository.enviarcodigo(codigoVerificacion, id);
-                    mailService.sendVerificationEmail(usuarioEncontrado.get(0), codigoVerificacion,contextpath,2);
-
-                    attr.addFlashAttribute("success", "Datos confirmados correctamente, se ha enviado un correo de confirmación.");
-                }
-            }
-            else{
-                attr.addFlashAttribute("already", "Usuario no registrado.");
-            }
-        }
-        return "redirect:/restablecercontrasena";
-    }
 
 
     @GetMapping({"oauth2/login"})
@@ -320,14 +328,20 @@ public class LoguinController {
 
         Usuario correoUsuario=usuarioRepository.oauth2User((String) currentUser.get("email"));
 
+        if (correoUsuario==null){
+            session.invalidate();
+            SecurityContextHolder.clearContext();
+            attr.addFlashAttribute("noexiste", "Error: cuenta google ingresada no existe en el registro de usuarios.");
+            return "redirect:/loginForm?error";
+        }
+
         Optional<Usuario>oauth2User=usuarioRepository.findById(correoUsuario.getId());
 
-
+        Usuario usuario=null;
 
 
         if(oauth2User.isPresent()){
-            Usuario usuario = oauth2User.get();
-
+            usuario = oauth2User.get();
             if ( (Objects.equals(usuario.getCategoria().getNombre(), "Administrativo")) || (Objects.equals(usuario.getCategoria().getNombre(), "Seguridad"))  ){
                 attr.addFlashAttribute("CancelLogin", "Error: El inicio de sesión con Google solo es válido para el Usuario PUCP, mas no para el Administrador o personal de Seguridad.");
                 session.invalidate();
@@ -336,41 +350,19 @@ public class LoguinController {
             }
             if (usuario.getHabilitado()==0){
                 String codigoVerificacion = RandomString.make(64);
-                usuarioRepository.enviarcodigo(codigoVerificacion, usuario.getId());
+                usuarioRepository.enviarcodigo(codigoVerificacion,2,usuario.getId() );
                 session.invalidate();
                 SecurityContextHolder.clearContext();
+                attr.addFlashAttribute("noregistrado","Aún no te has registrado, por favor ingresa tu contraseña para continuar");
                 return "redirect:/nuevacontrasena?token="+codigoVerificacion;
 
             }
-//            System.out.println(oAuth2AuthenticationToken.getPrincipal());
-//            System.out.println(oAuth2AuthenticationToken.getCredentials());
-//            System.out.println(oAuth2AuthenticationToken.getAuthorities());
-//            Collection<SimpleGrantedAuthority> oldAuthorities = (Collection<SimpleGrantedAuthority>)SecurityContextHolder.getContext().getAuthentication().getAuthorities();
-//            SimpleGrantedAuthority authority=new SimpleGrantedAuthority("Alumno");
-//            List<SimpleGrantedAuthority> updatedAuthorities = new ArrayList<SimpleGrantedAuthority>();
-//            updatedAuthorities.add(authority);
-//            updatedAuthorities.addAll(oldAuthorities);
-//            SecurityContextHolder.getContext().setAuthentication(
-//                    new UsernamePasswordAuthenticationToken(
-//                            SecurityContextHolder.getContext().getAuthentication().getPrincipal(),
-//                            SecurityContextHolder.getContext().getAuthentication().getCredentials(),
-//                            updatedAuthorities)
-//            );
-//
-//            SecurityContext context = SecurityContextHolder.createEmptyContext();
-//            Authentication authentication =
-//                    new TestingAuthenticationToken(usuario.getId(), usuario.getPwd(), usuario.getCategoria().getNombre());
-//            context.setAuthentication(authentication);
-
-
-
-
             session.setAttribute("usuariolog",usuario);
             return "redirect:/usuario";
         }
-        else{
-            return "redirect:/loginForm?error";
-        }
+        session.invalidate();
+        SecurityContextHolder.clearContext();
+        return "redirect:/registro";
 
 
     }

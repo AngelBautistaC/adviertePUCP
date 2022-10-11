@@ -14,7 +14,7 @@ public class SpringConfig {
     @Autowired
     MailService mailService;
 
-    @Scheduled(cron = "0 0/30 1-23 * * * ",zone = "America/Lima")
+    @Scheduled(cron = "0 59 23 * * * ",zone = "America/Lima")
     public void scheduleTaskUsingCronExpression() {
         mailService.eliminaToken();
     }

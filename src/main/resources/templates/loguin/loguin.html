@@ -2,6 +2,11 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <div  th:replace="fragmentos/loginfragment.html :: cabecera(title='AdviertePUCP-Login')"></div>
+    <style>
+        .alert{
+           max-width:368px
+        }
+    </style>
 </head>
 
 <body>
@@ -9,13 +14,9 @@
     <div class="container-fluid h-custom">
         <div class="row d-flex justify-content-center align-items-center h-100">
             <div class="col-md-9 col-lg-6 col-xl-5">
-
                 <img src="/images/loguin.png" style="width: 800px; height:670px"
                      class="img-fluid logueoimg" alt="Sample image">
-
             </div>
-
-
             <div class="col-md-8 col-lg-6 col-xl-4 offset-xl-1">
                 <img style="height: 165px;width: 393px" class="img-fluid " src="/images/quillaloguin.png">
 
@@ -34,10 +35,11 @@
                 </a>
                 </div>
                 <br>
-                <div th:if="${noexiste != null or CancelLogin != null }" class="card text-center" style="max-width: 368px">
+
                 <div th:if="${noexiste != null}" th:text="${noexiste}" class="alert alert-danger " role="alert"></div>
-                <div th:if="${CancelLogin != null}" th:text="${CancelLogin}" class="alert alert-danger" role="alert"></div>
-                </div>
+                    <div th:if="${CancelLogin != null}" th:text="${CancelLogin}" class="alert alert-danger " role="alert"></div>
+                <div th:if="${registrado != null}" th:text="${registrado}" class="alert alert-success" role="alert"></div>
+
 
                 <div class="divider d-flex align-items-center my-4" style="max-width: 368px">
                     <p class="text-center fw-bold mx-3 mb-0">O</p>

@@ -1,189 +1,81 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html">
 <head>
-  <!-- CSS only -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-gH2yIJqKdNHPEq0n4Mqa/HGKIhSkIHeL5AyhkYV8i59U5AR6csBvApHHNl/vI1Bx" crossorigin="anonymous">
-  <!-- JavaScript Bundle with Popper -->
-
-  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.5/dist/umd/popper.min.js" integrity="sha384-Xe+8cL9oJa6tN/veChSP7q+mnSPaj5Bcu9mPX5F5xIGE0DVittaqT5lorf0EI7Vk" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.min.js" integrity="sha384-ODmDIVzN+pFdexxHEHFBQH3/9/vQ9uori45z4JjnFsRydbmQbmL5t1tQ0culUzyK" crossorigin="anonymous"></script>
-
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.0/font/bootstrap-icons.css">
-
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="/css/loguin.css">
-  <link rel="stylesheet" href="/css/main.css">
-
-  <meta charset="UTF-8">
-  <title>AdviertePUCP-nuevaContraseña</title>
-  <link rel="icon" type="image/x-icon" href="/images/webICON.png">
-
-
-  <style>
-
-    .logueoimg{
-      box-shadow: 10px 10px 80px rgba(0, 0, 0, 0.3);
-    }
-
-
-    @media only screen and (max-width: 800px) {
-      .logueoimg {
-        display: none;
-      }
-      .ardilla{
-        max-height: 120px; !important;
-        max-width: 300px; !important;
-      }
-
-    }
-
-    .bg-image-vertical {
-      position: relative;
-      overflow: hidden;
-      background-repeat: no-repeat;
-      background-position: right center;
-      background-size: auto 100%;
-    }
-
-    @media (min-width: 1025px) {
-      .h-custom-2 {
-        height: 65%;
-      }
-      .formulario{
-        margin-left: 20%;
-      }
-      .advnav{
-        margin-left: 16%;
-        margin-top: 5%;
-      }
-
-      .ardilla{
-        height: 184px;
-        width: 423px;
-        margin-bottom: 30px ;
-      }
-
-
-    }
-
-
-
-  </style>
-
-  <meta name="google-signin-client_id" content="YOUR_CLIENT_ID.apps.googleusercontent.com">
+  <div  th:replace="fragmentos/loginfragment.html :: cabecera(title='AdviertePUCP-Nueva Contraseña')"></div>
 </head>
-<body>
 
-<!--    <img class="logueoimg"  style="position: absolute;height: 100%;z-index: -1"  src="/images/loguin.png">-->
-<section class="vh-100 vw-100">
-  <div class="container-fluid">
+<body>
+<section class="vh-100" style="background-color: hsl(0, 0%, 96%)">
+  <div class="container-fluid h-custom">
     <div class="row d-flex justify-content-center align-items-center h-100">
 
 
       <div class="col-md-9 col-lg-6 col-xl-5">
-        <img class="logueoimg" src="/images/loguin.png"
-             alt="Login image" style="height: 80%;width: 100%;text-align: center;margin-top: 15%">
+        <img src="/images/loguin.png" style="width: 800px; height:670px"
+             class="img-fluid logueoimg" alt="Sample image">
       </div>
 
 
+      <div class="col-md-8 col-lg-6 col-xl-4 offset-xl-1">
+        <img style="height: 165px;width: 393px" class="img-fluid " src="/images/quillaloguin.png">
 
+        <p><br></p>
 
-
-      <div class="col-sm-6 text-black">
-
-
-        <div  class=" px-5 ms-xl-4 " >
-
-
-
-          <div class="advnav " >
-            <img style="height: 184px;width: 423px" class="ardilla " src="/images/quillaloguin.png">
-            <!--                            <img style="height: 150px;width: 300px" class="ardillamobile " src="/images/quillaloguin.png">-->
-
+        <div class="card text-center"  style="max-width: 368px">
+          <div class="card-header" style="font-size: 20px;padding-top: 10px">
+            Sistema de Reporte de Incidencias
           </div>
         </div>
 
-        <div class="d-flex align-items-center h-custom-2 px-5 ms-xl-4 mt-5 pt-5 pt-xl-0 mt-xl-n5">
+        <br>
+        <h3 class="fw-normal mb-3 pb-3" style="letter-spacing: 1px;font-family: Roboto">Establecer una nueva contraseña</h3>
 
-          <form class="formulario needs-validation" th:action="@{'/nuevopwd'}" style="width: 23rem" method="post" novalidate autocomplete="off">
-            <input type="hidden" th:value="${token}" name="token" />
-
-            <div class="card text-center" style="margin-top: -50px;margin-bottom: 30px">
-              <div class="card-header" style="font-family: Roboto;font-size: 20px">
-                Sistema de Reporte de Incidencias
-              </div>
-            </div>
-
-            <h3 class="fw-normal mb-3 pb-3" style="letter-spacing: 1px;font-family: Roboto">Establecer una contraseña nueva</h3>
-            <div th:if="${invalidtoken != null}" th:text="${invalidtoken}" class="alert alert-alert" role="alert"></div>
-            <div th:if="${noregistrado != null}" th:text="${noregistrado}" class="alert alert-warning" role="alert"></div>
-
-
-            <div class="alert alert-primary alert-dismissible fade show" role="alert">
-              <h5 class="alert-heading">Consideraciones para la contraseña</h5>
-              <p class="mb-0">La contraseña debe contener un mínimo de 8 caracteres, una minúscula, una mayúscula y un carácter especial,tales como @#$%^&+=</p>
-              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-
-
-            <div class="form-outline mb-4">
-              <label class="form-label" for="validationCustom02"><br>Ingresa la nueva contraseña</label>
-              <input type="password" id="validationCustom02"  class="form-control form-control-lg" th:value="${pwd}" name="pwd"
-                     th:classappend="${fail==null?'':'is-invalid'}"/>
-              <div  th:if="${fail != null}" th:text="${fail}" class="invalid-feedback"></div>
-            </div>
-
-            <div class="form-outline mb-4">
-              <label for="validationCustom03" class="form-label">Ingresa la contraseña nuevamente</label>
-              <input type="password" id="validationCustom03"  class="form-control form-control-lg" th:value="${confirmpwd}" name="confirmpwd"
-                     th:classappend="${fail==null?'':'is-invalid'}"/>
-              <div  th:if="${fail != null}" th:text="${fail}" class="invalid-feedback"></div>
-            </div>
-
-            <div class="d-flex justify-content-center">
-              <div class="form-outline mb-4">
-                <button class="btn-hover color-3" type="submit"  style="border-radius: 10px;height: 75%;padding: 10px;"><b style="color: white">Guardar mi contraseña</b></button>
-              </div>
-            </div>
-
-            <p>¿Ya tienes una cuenta? <a href="/"  style="color: blue;font-family: Roboto" class="link-primary">¡Inicia Sesión!</a></p>
-
-          </form>
-
+        <div class="alert alert-primary alert-dismissible fade show" role="alert" style="max-width:368px ">
+          <h5 class="alert-heading">🐿️⚠️Consideraciones para la contraseña</h5>
+          <p class="mb-0">La contraseña debe contener un mínimo de 8 caracteres, una minúscula, una mayúscula y uno de los siguientes caracteres especiales: @#$%^&+=</p>
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
 
-      </div>
+        <div style="max-width: 368px">
+          <div th:if="${invalidtoken != null}" th:text="${invalidtoken}" class="alert alert-alert" role="alert"></div>
+          <div th:if="${noregistrado != null}" th:text="${noregistrado}" class="alert alert-warning" role="alert"></div>
+        </div>
 
+
+        <form th:action="@{'/nuevopwd'}" method="post" class="formulario" style="width: 23rem">
+          <input type="hidden" th:value="${token}" name="token" />
+
+          <!-- Password input -->
+          <div class="form-outline mb-4">
+            <label class="form-label" for="form2Example28">Ingresa la nueva contraseña</label>
+            <input name="pwd" th:value="${pwd}" type="password" id="form2Example28" class="form-control form-control-lg"    th:classappend="${fail==null?'':'is-invalid'}"/>
+            <div  th:if="${fail != null}" th:text="${fail}" class="invalid-feedback"></div>
+
+          </div>
+
+          <!-- Password input -->
+          <div class="form-outline mb-4">
+            <label class="form-label" for="form2Example29" >Ingresa la contraseña nuevamente</label>
+            <input name="confirmpwd" th:value="${confirmpwd}" type="password" id="form2Example29" class="form-control form-control-lg" th:classappend="${fail==null?'':'is-invalid'}"  />
+            <div  th:if="${fail != null}" th:text="${fail}" class="invalid-feedback"></div>
+
+          </div>
+          <br><div class="d-flex justify-content-start"><input class="form-check-input" type="checkbox" onclick="myFunction();myFunctionv2() ">&nbsp;Mostrar contraseñas</div>
+
+
+
+          <div class="card text-center border-light bg-transparent" style="max-width: 368px">
+            <button type="submit" class="btn btn-outline-primary btn-lg"
+                    style="padding-left: 2.5rem; padding-right: 2.5rem">Guardar mi contraseña</button>
+
+          </div>
+        </form>
+      </div>
     </div>
   </div>
+
 </section>
-
-<script>
-  (() => {
-    'use strict';
-
-    // Fetch all the forms we want to apply custom Bootstrap validation styles to
-    const forms = document.querySelectorAll('.needs-validation');
-
-    // Loop over them and prevent submission
-    Array.prototype.slice.call(forms).forEach((form) => {
-      form.addEventListener('submit', (event) => {
-        if (!form.checkValidity()) {
-          event.preventDefault();
-          event.stopPropagation();
-        }
-        form.classList.add('was-validated');
-      }, false);
-    });
-  })();
-  const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
-  const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
-
-</script>
-
-
 </body>
-
 
 
 </html>

@@ -182,7 +182,7 @@ public class LoguinController {
         if (usuarioEncontrado.size()==0){
             attr.addFlashAttribute("fail", "Los datos ingresados no coinciden con el registro de usuarios.");
         } else{
-            if(usuarioEncontrado.get(0).getHabilitado()==0){
+            if(usuarioEncontrado.get(0).getHabilitado()==1){
                 if (usuarioEncontrado.get(0).getContadortoken()==3){
 
                     attr.addFlashAttribute("tresintentos","3 intentos");

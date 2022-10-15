@@ -4,6 +4,13 @@ package com.example.adviertepucp.controller;
 import com.example.adviertepucp.entity.Usuario;
 import com.example.adviertepucp.repository.UsuarioRepository;
 import com.example.adviertepucp.service.MailService;
+import dev.samstevens.totp.code.HashingAlgorithm;
+import dev.samstevens.totp.exceptions.QrGenerationException;
+import dev.samstevens.totp.qr.QrData;
+import dev.samstevens.totp.qr.QrGenerator;
+import dev.samstevens.totp.qr.ZxingPngQrGenerator;
+import dev.samstevens.totp.secret.DefaultSecretGenerator;
+import dev.samstevens.totp.secret.SecretGenerator;
 import net.bytebuddy.utility.RandomString;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -31,9 +38,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.transaction.Transactional;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static dev.samstevens.totp.util.Utils.getDataUriForImage;
 
 @Controller
 public class LoguinController {
@@ -49,13 +59,7 @@ public class LoguinController {
     UsuarioRepository usuarioRepository;
 
     /*El código es número?*/
-    int parsearInt(String s) {
-        try {
-            return Integer.parseInt(s);
-        } catch (NumberFormatException e) {
-            return 0;
-        }
-    }
+
 
 
     /*Pagina principal:Loguin*/
@@ -90,7 +94,6 @@ public class LoguinController {
             break;
         }
 
-
         Usuario usuario=null;
 
         Optional<Usuario> optusuario=usuarioRepository.findById(auth.getName());
@@ -114,12 +117,104 @@ public class LoguinController {
             return "redirect:/administrador/";
         }
         if(rol.equals("Seguridad")){
-            return "redirect:/seguridad/";
+            //Se cambia el rol del seguridad mientras verifica su QR: transitorio::
+            Authentication authe = SecurityContextHolder.getContext().getAuthentication();
+
+            List<GrantedAuthority> updatedAuthorities = new ArrayList<>(authe.getAuthorities());
+            updatedAuthorities.remove(0);
+            updatedAuthorities.add(new SimpleGrantedAuthority("transitorio"));
+
+            Authentication newAuth = new UsernamePasswordAuthenticationToken(authe.getPrincipal(), authe.getCredentials(), updatedAuthorities);
+
+            SecurityContextHolder.getContext().setAuthentication(newAuth);
+            return "redirect:/autenticacion";
+        }
+        if(rol.equals("transitorio")){
+            return "redirect:/autenticacion";
         }
         else{
             return "redirect:/usuario/";
         }
     }
+
+    /*2FA AUTH: Google Authenticator*/
+    @GetMapping({"autenticacion"})
+    public String authenticacion(HttpSession session){
+
+       Usuario rolTransitorio=(Usuario) session.getAttribute("usuariolog");
+
+       //Lógica Nuevo Seguridad
+       if (rolTransitorio.getHabilitado()==1 && Objects.equals(rolTransitorio.getSecret(), "2")){
+           return "redirect:/qrnuevoseguridad";
+       }
+       //else
+        //TODO: esto va en el POST  de la autentitcacion...
+        Authentication authe = SecurityContextHolder.getContext().getAuthentication();
+
+        List<GrantedAuthority> updatedAuthorities = new ArrayList<>(authe.getAuthorities());
+        updatedAuthorities.remove(0);
+        updatedAuthorities.add(new SimpleGrantedAuthority("Seguridad"));
+        Authentication newAuth = new UsernamePasswordAuthenticationToken(authe.getPrincipal(), authe.getCredentials(), updatedAuthorities);
+        SecurityContextHolder.getContext().setAuthentication(newAuth);
+
+        return "loguin/autenticacion";
+    }
+
+    @GetMapping({"qrnuevoseguridad"})
+    public String qrnuevoseguridad(HttpSession session) throws MessagingException, UnsupportedEncodingException {
+
+        Usuario rolTransitorio=(Usuario) session.getAttribute("usuariolog");
+
+        if (Objects.equals(rolTransitorio.getSecret(), "2")){
+            //Se Asigna secret al seguridad:
+            SecretGenerator secretGenerator = new DefaultSecretGenerator();
+            String secret = secretGenerator.generate();
+            usuarioRepository.asignarSecret(secret,rolTransitorio.getId());
+
+            QrData data = new QrData.Builder()
+                    .label(rolTransitorio.getCorreo())
+                    .secret(secret)
+                    .issuer("AdviertePUCP")
+                    .algorithm(HashingAlgorithm.SHA1)
+                    .digits(6)
+                    .period(30)
+                    .build();
+            QrGenerator generator = new ZxingPngQrGenerator();
+
+            byte[] imageData;
+            try {
+                imageData = generator.generate(data);
+            } catch (QrGenerationException e) {
+                throw new RuntimeException(e);
+            }
+            String mimeType = generator.getImageMimeType();
+
+            String dataUri = getDataUriForImage(imageData, mimeType);
+            mailService.enviaQRSecreto(rolTransitorio,data.getUri());
+            session.setAttribute("dataUri",dataUri );
+        }
+
+        if (session.getAttribute("dataUri") == null) {
+            return "loguin/autenticacion";
+        }
+
+
+        return "loguin/qrnuevoseguridad";
+    }
+
+
+//    @GetMapping({"/autenticacion"})
+//    public String autenticacion()
+//    {
+//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//        if (authentication == null || authentication instanceof AnonymousAuthenticationToken) {
+//            return "loguin/autenticacion";
+//        }
+//
+//        return "redirect:/redirectByRole";
+//    }
+
+
 
 
 
@@ -138,23 +233,6 @@ public class LoguinController {
 
     }
 
-
-
-
-
-
-    /*Autenticación de doble factor*/
-
-    @GetMapping({"/autenticacion"})
-    public String autenticacion()
-    {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null || authentication instanceof AnonymousAuthenticationToken) {
-            return "loguin/autenticacion";
-        }
-
-        return "redirect:/redirectByRole";
-    }
 
 
     /*Registro de Usuario*/

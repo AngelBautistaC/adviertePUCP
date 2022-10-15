@@ -15,6 +15,8 @@ import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import javax.servlet.ServletContext;
 import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalTime;
 import java.time.ZoneId;
 
@@ -91,6 +93,41 @@ public class MailService {
         helper.setText(content, true);
         mailSender.send(message);
     }
+
+    @Async
+    public void enviaQRSecreto(Usuario user,String dataUri) throws MessagingException, UnsupportedEncodingException {
+        String subject =null;
+        String content=null;
+        subject = "AdviertePUCP-Verificacion de dos pasos";
+        content = "Estimado [[name]],<br>"
+                + "A continuación, se muestra tu código QR único para poder ingresar al sistema. <br>Recuerda que,este código es necesario para ingresar al sistema y, por ello, no debes compartirlo con nadie<br>"
+                + "<img src='[[uri]]' >"
+                + "<br>Muchas gracias,<br>"
+                + "El equipo de AdviertePUCP.";
+
+        String toAddress = user.getCorreo();
+        String fromAddress = "noreply.adviertepucp@gmail.com";
+        String senderName = "Equipo de AdviertePUCP";
+
+        MimeMessage message = mailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message, StandardCharsets.UTF_8.name());
+        helper.setFrom(fromAddress, senderName);
+        helper.setTo(toAddress);
+        helper.setSubject(subject);
+        content = content.replace("[[name]]", user.getNombre());
+        dataUri=URLEncoder.encode(dataUri, StandardCharsets.UTF_8).replaceAll("&+", "%26");
+
+        dataUri="https://quickchart.io/qr?text="+dataUri+"&size=200";
+        content = content.replace("[[uri]]", dataUri);
+        helper.setText(content, true);
+        mailSender.send(message);
+
+
+        //System.out.println("**/*/*/*/*");
+        //System.out.println(dataUri);
+    }
+
+
 
 
 

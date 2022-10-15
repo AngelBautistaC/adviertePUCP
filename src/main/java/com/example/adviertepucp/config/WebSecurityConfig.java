@@ -32,10 +32,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http.oauth2Login().loginPage("/loginForm").defaultSuccessUrl("/oauth2/login",true);
 
         http.authorizeRequests()
-                .antMatchers("/usuario","/usuario/**").access("isAuthenticated() and not hasAnyAuthority('Administrativo','Seguridad')")
+                .antMatchers("/usuario","/usuario/**").access("isAuthenticated() and not hasAnyAuthority('Administrativo','Seguridad','transitorio')")
                 .antMatchers("/seguridad","/seguridad/**").hasAnyAuthority("Seguridad")
                 .antMatchers("/administrador","/administrador/**").hasAnyAuthority("Administrativo")
-                .antMatchers("/suspendido").access("isAuthenticated() and not hasAnyAuthority('Administrativo','Seguridad')")
+                .antMatchers("/suspendido").access("isAuthenticated() and not hasAnyAuthority('Administrativo','Seguridad','transitorio')")
+                .antMatchers("/autenticacion").access("isAuthenticated() and hasAnyAuthority('transitorio')")
                 .anyRequest().permitAll();
 
         http.logout()

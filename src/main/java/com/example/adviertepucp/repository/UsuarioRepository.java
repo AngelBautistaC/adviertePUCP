@@ -13,6 +13,7 @@ import com.example.adviertepucp.entity.Usuario;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.web.bind.annotation.ModelAttribute;
 
 import javax.transaction.Transactional;
 import java.util.List;
@@ -24,6 +25,12 @@ public interface UsuarioRepository extends JpaRepository<Usuario, String> {
     List<Usuario> validarUsuario(String codigo, String correo);
 
     public Usuario findByEmail(String correo);
+
+    @Modifying
+    @Transactional
+    @Query(value = "update usuario set secret=?1,habilitado=1 where codigo=?2",nativeQuery = true)
+    void asignarSecret(String secret,String codigo);
+
 
     @Modifying
     @Transactional

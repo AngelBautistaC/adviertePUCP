@@ -74,6 +74,18 @@ public class Usuario implements Serializable {
     @Column(name = "contadortoken", nullable = false)
     private Byte contadortoken;
 
+    @Size(max = 64)
+    @Column(name = "secret", length = 64)
+    private String secret;
+
+    public String getSecret() {
+        return secret;
+    }
+
+    public void setSecret(String secret) {
+        this.secret = secret;
+    }
+
     public Byte getContadortoken() {
         return contadortoken;
     }

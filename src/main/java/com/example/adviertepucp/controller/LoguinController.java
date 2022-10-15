@@ -4,13 +4,15 @@ package com.example.adviertepucp.controller;
 import com.example.adviertepucp.entity.Usuario;
 import com.example.adviertepucp.repository.UsuarioRepository;
 import com.example.adviertepucp.service.MailService;
-import dev.samstevens.totp.code.HashingAlgorithm;
+import dev.samstevens.totp.code.*;
 import dev.samstevens.totp.exceptions.QrGenerationException;
 import dev.samstevens.totp.qr.QrData;
 import dev.samstevens.totp.qr.QrGenerator;
 import dev.samstevens.totp.qr.ZxingPngQrGenerator;
 import dev.samstevens.totp.secret.DefaultSecretGenerator;
 import dev.samstevens.totp.secret.SecretGenerator;
+import dev.samstevens.totp.time.SystemTimeProvider;
+import dev.samstevens.totp.time.TimeProvider;
 import net.bytebuddy.utility.RandomString;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -144,26 +146,38 @@ public class LoguinController {
        Usuario rolTransitorio=(Usuario) session.getAttribute("usuariolog");
 
        //Lógica Nuevo Seguridad
-       if (rolTransitorio.getHabilitado()==1 && Objects.equals(rolTransitorio.getSecret(), "2")){
+       if (rolTransitorio.getHabilitado()==1 && ( (Objects.equals(rolTransitorio.getSecret(), "2")) ||  (Objects.equals(rolTransitorio.getSecret(), "3")) ) ){
            return "redirect:/qrnuevoseguridad";
        }
        //else
-        //TODO: esto va en el POST  de la autentitcacion...
-        Authentication authe = SecurityContextHolder.getContext().getAuthentication();
-
-        List<GrantedAuthority> updatedAuthorities = new ArrayList<>(authe.getAuthorities());
-        updatedAuthorities.remove(0);
-        updatedAuthorities.add(new SimpleGrantedAuthority("Seguridad"));
-        Authentication newAuth = new UsernamePasswordAuthenticationToken(authe.getPrincipal(), authe.getCredentials(), updatedAuthorities);
-        SecurityContextHolder.getContext().setAuthentication(newAuth);
-
         return "loguin/autenticacion";
+    }
+    @PostMapping({"enviaAutenticacion"})
+    public String enviaAutenticacion(RedirectAttributes attr, HttpSession session,
+                                     @RequestParam ("code") String code){
+        Usuario rolTransitorio=(Usuario) session.getAttribute("usuariolog");
+        TimeProvider timeProvider = new SystemTimeProvider();
+        CodeGenerator codeGenerator = new DefaultCodeGenerator();
+        CodeVerifier verifier = new DefaultCodeVerifier(codeGenerator, timeProvider);
+        boolean successful = verifier.isValidCode(rolTransitorio.getSecret(), code);
+        if (successful){
+            Authentication authe = SecurityContextHolder.getContext().getAuthentication();
+            List<GrantedAuthority> updatedAuthorities = new ArrayList<>(authe.getAuthorities());
+            updatedAuthorities.remove(0);
+            updatedAuthorities.add(new SimpleGrantedAuthority("Seguridad"));
+            Authentication newAuth = new UsernamePasswordAuthenticationToken(authe.getPrincipal(), authe.getCredentials(), updatedAuthorities);
+            SecurityContextHolder.getContext().setAuthentication(newAuth);
+            return "redirect:/seguridad";
+        }
+        attr.addFlashAttribute("invalidcode","invalidcode");
+        return "redirect:/autenticacion";
     }
 
     @GetMapping({"qrnuevoseguridad"})
     public String qrnuevoseguridad(HttpSession session) throws MessagingException, UnsupportedEncodingException {
 
         Usuario rolTransitorio=(Usuario) session.getAttribute("usuariolog");
+
 
         if (Objects.equals(rolTransitorio.getSecret(), "2")){
             //Se Asigna secret al seguridad:
@@ -191,11 +205,18 @@ public class LoguinController {
 
             String dataUri = getDataUriForImage(imageData, mimeType);
             mailService.enviaQRSecreto(rolTransitorio,data.getUri());
+
+            rolTransitorio.setSecret("3");
+            session.setAttribute("usuariolog", rolTransitorio);
             session.setAttribute("dataUri",dataUri );
         }
 
+        if (Objects.equals(rolTransitorio.getSecret(), "3")){
+            return "loguin/qrnuevoseguridad";
+        }
+
         if (session.getAttribute("dataUri") == null) {
-            return "loguin/autenticacion";
+            return "redirect:/autenticacion";
         }
 
 
